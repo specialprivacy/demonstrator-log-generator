@@ -1,23 +1,23 @@
 package main
 
 import (
-	"github.com/cenkalti/backoff"
-	"fmt"
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/cenkalti/backoff"
 	"io/ioutil"
 	"net/http"
 )
 
 type tokenResponse struct {
-	AccessToken string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn int `json:"expires_in"`
-	RefreshExpiresIn int `json:"refresh_expires_in"`
-	TokenType string `json:"token_type"`
-	Scope string `json:"scope"`
-	SessionState string `json:"session_state"`
-	NotBeforePolicy int `json:"not-before-policy"`
+	AccessToken      string `json:"access_token"`
+	RefreshToken     string `json:"refresh_token"`
+	ExpiresIn        int    `json:"expires_in"`
+	RefreshExpiresIn int    `json:"refresh_expires_in"`
+	TokenType        string `json:"token_type"`
+	Scope            string `json:"scope"`
+	SessionState     string `json:"session_state"`
+	NotBeforePolicy  int    `json:"not-before-policy"`
 }
 
 func authenticate(endpoint string, username string, password string) (string, error) {
@@ -64,12 +64,12 @@ type userRepresentation struct {
 }
 
 func getUserList(endpoint string, token string) ([]string, error) {
-	req, err := http.NewRequest("GET", endpoint + "/admin/realms/master/users", nil)
+	req, err := http.NewRequest("GET", endpoint+"/admin/realms/master/users", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", "Bearer " + token)
+	req.Header.Set("Authorization", "Bearer "+token)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

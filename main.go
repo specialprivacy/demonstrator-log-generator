@@ -40,7 +40,7 @@ type policy struct {
 	SimplePolicies []simplepolicy `json:"simplePolicies"`
 }
 
-// Will run for 5 minutes after which it will exit causing it to reload the user list 
+// Will run for 5 minutes after which it will exit causing it to reload the user list
 // and applications (easier than implementing polling)
 func generateLog(users []string, applications []policy, rate time.Duration, ch chan log) {
 	amount := int64(5 * time.Minute / rate)
