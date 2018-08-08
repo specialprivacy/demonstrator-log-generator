@@ -40,11 +40,11 @@ type policy struct {
 	SimplePolicies []simplepolicy `json:"simplePolicies"`
 }
 
-// TODO: make it generate for 5 minutes
-// After this time the process will stop and swarm/compose will reschedule
-// causing it to reload the user list and applications (easier than implementing polling)
+// Will run for 5 minutes after which it will exit causing it to reload the user list 
+// and applications (easier than implementing polling)
 func generateLog(users []string, applications []policy, rate time.Duration, ch chan log) {
-	for {
+	amount := int64(5 * time.Minute / rate)
+	for i := int64(0); i < amount; i++ {
 		application := applications[rand.Intn(len(applications))]
 		policy := application.SimplePolicies[rand.Intn(len(application.SimplePolicies))]
 		userID := users[rand.Intn(len(users))]
