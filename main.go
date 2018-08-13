@@ -9,6 +9,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/cenkalti/backoff"
+	"github.com/google/uuid"
 	"github.com/urfave/cli"
 )
 
@@ -59,9 +60,11 @@ func generateLog(users []string, applications []policy, rate time.Duration, ch c
 			Storage:    policy.Storage,
 			UserID:     userID,
 			Data:       data,
+			EventID:    uuid.New().String(),
 		}
 		time.Sleep(rate)
 	}
+	close(ch)
 }
 
 func main() {

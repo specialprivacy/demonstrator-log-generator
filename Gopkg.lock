@@ -44,6 +44,12 @@
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
+  name = "github.com/google/uuid"
+  packages = ["."]
+  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
+  version = "0.2"
+
+[[projects]]
   name = "github.com/pierrec/lz4"
   packages = [
     ".",
@@ -73,6 +79,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b015da426d4e9eb223409735a4bea33c48b2e43320644bc6c5de8ff1264d34d1"
+  inputs-digest = "e7df649bbe1afa3255e6214d60f9c6bcc1c990da2c59f44c6e1c31b3d7e14a69"
   solver-name = "gps-cdcl"
   solver-version = 1
