@@ -98,7 +98,7 @@ func getUserList(endpoint string, token string) ([]string, error) {
 
 	userList := make([]string, len(userRepresenations))
 	for _, user := range userRepresenations {
-		if user.Enabled {
+		if user.Enabled && user.ID != "" {
 			userList = append(userList, user.ID)
 		}
 	}
