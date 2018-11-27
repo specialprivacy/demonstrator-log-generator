@@ -64,7 +64,12 @@ type userRepresentation struct {
 }
 
 func getUserList(endpoint string, token string) ([]string, error) {
-	req, err := http.NewRequest("GET", endpoint+"/admin/realms/special/users", nil)
+	groupID, err := getDataSubjectsGroupId(endpoint, token);
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", endpoint+"/admin/realms/special/groups/" + groupID + "/members", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +108,49 @@ func getUserList(endpoint string, token string) ([]string, error) {
 		}
 	}
 	return userList, nil
+}
+
+type groupRepresentation struct {
+	ID               string `json:"id"`
+	Name         string `json:"name"`
+}
+func getDataSubjectsGroupId(endpoint string, token string) (string, error) {
+	req, err := http.NewRequest("GET", endpoint+"/admin/realms/special/groups?search=data-subjects", nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 && resp.StatusCode < 500 {
+		return "", backoff.Permanent(fmt.Errorf("Failed to retrieve data subjects group with statusCode %d: %s", resp.StatusCode, resp.Status))
+	}
+	if resp.StatusCode >= 500 {
+		return "", fmt.Errorf("Failed to retrieve data subjects group with statusCode %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Printf("[DEBUG] Response Body: %s\n", body)
+	if err != nil {
+		return "", backoff.Permanent(err)
+	}
+
+	var groupRepresentations []groupRepresentation
+	err = json.Unmarshal(body, &groupRepresentations)
+	if err != nil {
+		return "", backoff.Permanent(err)
+	}
+
+	if len(groupRepresentations) <= 0 {
+		return "", fmt.Errorf("Failed to retrieve data subjects group")
+	}
+	return groupRepresentations[0].ID, nil
 }
 
 type applicationListResponse struct {
