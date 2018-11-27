@@ -90,14 +90,14 @@ func getUserList(endpoint string, token string) ([]string, error) {
 		return nil, backoff.Permanent(err)
 	}
 
-	var userRepresenations []userRepresentation
-	err = json.Unmarshal(body, &userRepresenations)
+	var userRepresentations []userRepresentation
+	err = json.Unmarshal(body, &userRepresentations)
 	if err != nil {
 		return nil, backoff.Permanent(err)
 	}
 
 	var userList []string
-	for _, user := range userRepresenations {
+	for _, user := range userRepresentations {
 		if user.Enabled {
 			userList = append(userList, user.ID)
 		}
