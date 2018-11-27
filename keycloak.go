@@ -21,9 +21,9 @@ type tokenResponse struct {
 }
 
 func authenticate(endpoint string, username string, password string) (string, error) {
-	postBody := []byte("username=" + username + "&password=" + password + "&client_id=admin-cli&grant_type=password")
+	postBody := []byte("username=" + username + "&password=" + password + "&client_id=special-platform&client_secret=special-platform-secret&grant_type=password")
 	resp, err := http.Post(
-		endpoint+"/realms/master/protocol/openid-connect/token",
+		endpoint+"/realms/special/protocol/openid-connect/token",
 		"application/x-www-form-urlencoded",
 		bytes.NewBuffer(postBody),
 	)
@@ -64,7 +64,7 @@ type userRepresentation struct {
 }
 
 func getUserList(endpoint string, token string) ([]string, error) {
-	req, err := http.NewRequest("GET", endpoint+"/admin/realms/master/users", nil)
+	req, err := http.NewRequest("GET", endpoint+"/admin/realms/special/users", nil)
 	if err != nil {
 		return nil, err
 	}
