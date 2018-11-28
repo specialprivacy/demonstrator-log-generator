@@ -20,10 +20,10 @@ type tokenResponse struct {
 	NotBeforePolicy  int    `json:"not-before-policy"`
 }
 
-func authenticate(endpoint string, username string, password string) (string, error) {
-	postBody := []byte("username=" + username + "&password=" + password + "&client_id=special-platform&client_secret=special-platform-secret&grant_type=password")
+func authenticate(realm string, endpoint string, username string, password string, clientID string, clientSecret string) (string, error) {
+	postBody := []byte("username=" + username + "&password=" + password + "&client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=password")
 	resp, err := http.Post(
-		endpoint+"/realms/special/protocol/openid-connect/token",
+		endpoint+"/realms/" + realm + "/protocol/openid-connect/token",
 		"application/x-www-form-urlencoded",
 		bytes.NewBuffer(postBody),
 	)
@@ -63,13 +63,13 @@ type userRepresentation struct {
 	Username         string `json:"username"`
 }
 
-func getUserList(endpoint string, token string) ([]string, error) {
-	groupID, err := getDataSubjectsGroupId(endpoint, token);
+func getUserList(realm string, endpoint string, token string) ([]string, error) {
+	groupID, err := getDataSubjectsGroupId(realm, endpoint, token);
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", endpoint+"/admin/realms/special/groups/" + groupID + "/members", nil)
+	req, err := http.NewRequest("GET", endpoint+"/admin/realms/" + realm + "/groups/" + groupID + "/members", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +114,8 @@ type groupRepresentation struct {
 	ID               string `json:"id"`
 	Name         string `json:"name"`
 }
-func getDataSubjectsGroupId(endpoint string, token string) (string, error) {
-	req, err := http.NewRequest("GET", endpoint+"/admin/realms/special/groups?search=data-subjects", nil)
+func getDataSubjectsGroupId(realm string, endpoint string, token string) (string, error) {
+	req, err := http.NewRequest("GET", endpoint+"/admin/realms/" + realm + "/groups?search=data-subjects", nil)
 	if err != nil {
 		return "", err
 	}

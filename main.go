@@ -121,6 +121,12 @@ func main() {
 			EnvVar: "KAFKA_VERIFY_SSL",
 		},
 		cli.StringFlag{
+			Name:   "keycloak-realm",
+			Value:  "special",
+			Usage:  "The realm where the data subjects information is stored",
+			EnvVar: "KEYCLOAK_REALM",
+		},
+		cli.StringFlag{
 			Name:   "keycloak-endpoint",
 			Value:  "http://keycloak:8080/auth",
 			Usage:  "The url where the keycloak server can be reached",
@@ -128,13 +134,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "keycloak-user",
-			Value:  "keycloak",
+			Value:  "demonstrator-generator",
 			Usage:  "The username for the keycloak connection",
 			EnvVar: "KEYCLOAK_USER",
 		},
 		cli.StringFlag{
 			Name:   "keycloak-password",
-			Value:  "keycloak",
+			Value:  "demonstrator-generator",
 			Usage:  "The password for the keycloak connection",
 			EnvVar: "KEYCLOAK_PASSWORD",
 		},
@@ -143,6 +149,18 @@ func main() {
 			Value:  "http://consent-management-backend",
 			Usage:  "The url where the consent management backend can be reached",
 			EnvVar: "BACKEND_ENDPOINT",
+		},
+		cli.StringFlag{
+			Name:   "keycloak-client-id",
+			Value:  "special-platform",
+			Usage:  "The ID for the keycloak client used to fetch data subjects information",
+			EnvVar: "KEYCLOAK_CLIENT_ID",
+		},
+		cli.StringFlag{
+			Name:   "keycloak-client-secret",
+			Value:  "special-platform-secret",
+			Usage:  "The secret for the keycloak client used to fetch data subjects information",
+			EnvVar: "KEYCLOAK_CLIENT_SECRET",
 		},
 	}
 
@@ -156,9 +174,12 @@ func main() {
 		var err error
 
 		// Get the list of users from keycloak
+		keycloakRealm := c.String("keycloak-realm")
 		keycloakEndpoint := c.String("keycloak-endpoint")
 		keycloakUser := c.String("keycloak-user")
 		keycloakPassword := c.String("keycloak-password")
+		keycloakClientID := c.String("keycloak-client-id")
+		keycloakClientSecret := c.String("keycloak-client-secret")
 
 		const maxDuration = time.Duration(1 * time.Minute)
 		b := backoff.NewExponentialBackOff()
@@ -167,7 +188,7 @@ func main() {
 		fmt.Println("[INFO] Authenticating against keycloak")
 		var token string
 		operation := func() error {
-			token, err = authenticate(keycloakEndpoint, keycloakUser, keycloakPassword)
+			token, err = authenticate(keycloakRealm, keycloakEndpoint, keycloakUser, keycloakPassword, keycloakClientID, keycloakClientSecret)
 			return err
 		}
 		err = backoff.Retry(operation, b)
@@ -179,7 +200,7 @@ func main() {
 		fmt.Println("[INFO] Retrieving user list")
 		var userList []string
 		operation = func() error {
-			userList, err = getUserList(keycloakEndpoint, token)
+			userList, err = getUserList(keycloakRealm, keycloakEndpoint, token)
 			return err
 		}
 		err = backoff.Retry(operation, b)
