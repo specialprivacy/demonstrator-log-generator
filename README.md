@@ -1,9 +1,11 @@
 # Demonstrator Log Generator
+
+## Description
 This is a simple application for use in the SPECIAL demonstrator. It simulates a line of bussines application by pulling a list of configured repositories from the consent management backend and a list of users from keycloak. It uses these to generate random policies based on the current configuration.
 
 No additional features are planned for this application.
 
-## Options
+## Configuration
 *   **--rate**: The rate at which the generator outputs events (default: 5s) [$RATE]
 *   **--kafka-broker-list**: A comma separated list of brokers used to bootstrap the connection to a kafka cluster. eg: 127.0.0.1, 172.10.50.4 (default: "kafka:9094") [$KAFKA_BROKER_LIST]
 *   **--kafka-topic**: The name of the topic on which logs will be produced. (default: "application-logs") [$KAFKA_TOPIC]
