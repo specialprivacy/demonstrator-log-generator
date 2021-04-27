@@ -2,6 +2,7 @@ FROM golang:alpine AS builder
 
 WORKDIR /go/src/demonstrator-log-generator
 COPY . .
+RUN go mod init
 RUN go build
 
 FROM  alpine

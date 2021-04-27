@@ -7,6 +7,7 @@ import (
 	"github.com/cenkalti/backoff"
 	"io/ioutil"
 	"net/http"
+	"crypto/tls"
 )
 
 type tokenResponse struct {
@@ -21,8 +22,12 @@ type tokenResponse struct {
 }
 
 func authenticate(realm string, endpoint string, username string, password string, clientID string, clientSecret string) (string, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 	postBody := []byte("username=" + username + "&password=" + password + "&client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=password")
-	resp, err := http.Post(
+	resp, err := client.Post(
 		endpoint+"/realms/" + realm + "/protocol/openid-connect/token",
 		"application/x-www-form-urlencoded",
 		bytes.NewBuffer(postBody),
@@ -64,6 +69,11 @@ type userRepresentation struct {
 }
 
 func getUserList(realm string, endpoint string, token string) ([]string, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
 	groupID, err := getDataSubjectsGroupId(realm, endpoint, token);
 	if err != nil {
 		return nil, err
@@ -75,7 +85,6 @@ func getUserList(realm string, endpoint string, token string) ([]string, error) 
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -115,13 +124,17 @@ type groupRepresentation struct {
 	Name         string `json:"name"`
 }
 func getDataSubjectsGroupId(realm string, endpoint string, token string) (string, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
 	req, err := http.NewRequest("GET", endpoint+"/admin/realms/" + realm + "/groups?search=data-subjects", nil)
 	if err != nil {
 		return "", err
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
@@ -162,13 +175,16 @@ type policyListResponse struct {
 }
 
 func getApplicationPolicies(endpoint string, token string) ([]policy, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest("GET", endpoint+"/applications/", nil)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token)
-	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
